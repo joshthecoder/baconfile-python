@@ -3,6 +3,7 @@
 
 import urllib2
 import os, sys
+from datetime import datetime
 
 if sys.version_info < (2,6,):
   import simplejson as json
@@ -66,6 +67,7 @@ if __name__ == '__main__':
     print ''
     exit(1)
 
+  '''Fetch command'''
   if sys.argv[1] == 'fetch':
     if len(sys.argv) < 4:
       print 'Usage: baconfile fetch <username> <remotefile> [dest]'
@@ -84,6 +86,27 @@ if __name__ == '__main__':
     except urllib2.HTTPError, e:
       print 'Unable to fetch file: %s' % e
       exit(1)
+
+  '''ls command'''
+  if sys.argv[1] == 'ls':
+    if len(sys.argv) < 3:
+      print 'Usage: baconfile ls <username> [folder]'
+      print '   folder  -  folder to list (if not provided, lists root)'
+      print ''
+      exit(1)
+    if len(sys.argv) == 4:
+      folder = sys.argv[3]
+    else: folder = ''
+
+    items = fetch_folder(sys.argv[2], folder)
+    for i in items:
+      if i.size is None: size = 'D'
+      else: size = str(i.size)
+      time = str(datetime.fromtimestamp(i.time_modified))
+      print '%s  %s  %s  %s' % \
+         (time, i.type.rjust(6), size.rjust(8), i.name)
+
+    print '  %i items' % len(items)
 
   else:
     print 'Invalid command. Type "baconfile" for help.'
