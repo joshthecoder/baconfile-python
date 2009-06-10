@@ -56,3 +56,35 @@ def fetch_recent_files():
   items = json.loads(r.read())['items']
   return list(FolderItem(i) for i in items)
 
+if __name__ == '__main__':
+  '''Running in standalone'''
+  if len(sys.argv) < 2:
+    print 'Usage: baconfile <command>'
+    print 'Commands:'
+    print '    fetch  -  fetch file from baconfile.com'
+    print '    ls     -  list folder contents'
+    print ''
+    exit(1)
+
+  if sys.argv[1] == 'fetch':
+    if len(sys.argv) < 4:
+      print 'Usage: baconfile fetch <username> <remotefile> [dest]'
+      print '   remotefile  -  path on baconfile.com where file is stored'
+      print '   dest        -  local path to save file (optional)'
+      print 'example: baconfile fetch someuser stuff/file.txt'
+      print ''
+      exit(1)
+    if len(sys.argv) == 5:
+      dest = sys.argv[4]
+    else: dest = sys.argv[3].rsplit('/',1)[-1]
+
+    try:
+      f = fetch_file(sys.argv[2], sys.argv[3])
+      f.save_file(dest)
+    except urllib2.HTTPError, e:
+      print 'Unable to fetch file: %s' % e
+      exit(1)
+
+  else:
+    print 'Invalid command. Type "baconfile" for help.'
+    exit(1)
