@@ -6,19 +6,26 @@ Library
 -------
 The library provides functions for accessing the baconfile.com
 API from within your python applications.
-See examples for more details.
 
 To install just be sure to put the module into your python path
 or simply include the module within your project's source.
+
+For more infomation check out the hello.py example.
+Also read through the baconfile.py module, its not that big. 
 
 Tool
 ----
 You may also use the baconfile module as a standalone tool
 from the commandline.
 
-To install copy baconfile.py to a folder in your PATH
-(example: /usr/bin). Set chmod +x on the file. You might also
-want to rename the module to baconfile.
+To install:
+  1. Copy baconfile.py into a folder that is in your PATH.
+     Example: cp baconfile.py /usr/bin/baconfile
+  2. Give the baconfile executable permission.
+     Example: chmod +x /usr/bin/baconfile
+  3. Enjoy by typing baconfile into the commandline.
+
+Usuage: baconfile <command>
 
 Available commands:
   fetch  - fetch a file from baconfile.com
