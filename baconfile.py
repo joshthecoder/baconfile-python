@@ -64,6 +64,7 @@ if __name__ == '__main__':
     print 'Commands:'
     print '    fetch  -  fetch file from baconfile.com'
     print '    ls     -  list folder contents'
+    print '    recent -  list recently uploaded files'
     print ''
     exit(1)
 
@@ -88,17 +89,20 @@ if __name__ == '__main__':
       exit(1)
 
   '''ls command'''
-  if sys.argv[1] == 'ls':
-    if len(sys.argv) < 3:
-      print 'Usage: baconfile ls <username> [folder]'
-      print '   folder  -  folder to list (if not provided, lists root)'
-      print ''
-      exit(1)
-    if len(sys.argv) == 4:
-      folder = sys.argv[3]
-    else: folder = ''
+  if sys.argv[1] == 'ls' or sys.argv[1] == 'recent':
+    if sys.argv[1] == 'ls':
+      if len(sys.argv) < 3:
+        print 'Usage: baconfile ls <username> [folder]'
+        print '   folder  -  folder to list (if not provided, lists root)'
+        print ''
+        exit(1)
+      if len(sys.argv) == 4:
+        folder = sys.argv[3]
+      else: folder = ''
+      items = fetch_folder(sys.argv[2], folder)
+    else:
+      items = fetch_recent_files()
 
-    items = fetch_folder(sys.argv[2], folder)
     for i in items:
       if i.size is None: size = 'D'
       else: size = str(i.size)
