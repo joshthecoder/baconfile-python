@@ -30,6 +30,7 @@ Usuage: baconfile <command>
 Available commands:
   fetch  - fetch a file from baconfile.com
   ls     - list files within a folder
+  recent - list recently uploaded files
 
 License: MIT 
 Author: Joshua Roesslein
