@@ -1,9 +1,12 @@
-# Copyright 2009 Joshua Roesslein
+# Copyright 2009 Joshua Roesslein <jroesslein at gmail.com>
 # Licensed under the MIT License
+# http://github.com/joshthecoder/baconfile-python
 
 import urllib2
 import os, sys
 from datetime import datetime
+
+import pycurl
 
 if sys.version_info < (2,6,):
   import simplejson as json
@@ -56,6 +59,18 @@ def fetch_recent_files():
   r = urllib2.urlopen(baconfile_url + 'public.json')
   items = json.loads(r.read())['items']
   return list(FolderItem(i) for i in items)
+
+def new_file(username, passwd, destpath, targetpath):
+  curl = pycurl.Curl()
+  curl.setopt(pycurl.USERPWD, '%s:%s' % (username, passwd))
+  curl.setopt(pycurl.POST, 1)
+  curl.setopt(pycurl.URL, _build_url(username, destpath))
+
+  curl.setopt(curl.HTTPPOST, [
+    ("file", (curl.FORM_FILE, targetpath))
+  ])
+  curl.perform()
+  curl.close()
 
 if __name__ == '__main__':
   '''Running in standalone'''
