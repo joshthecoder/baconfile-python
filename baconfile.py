@@ -7,8 +7,6 @@ import urllib2
 import os, sys
 from datetime import datetime
 
-import pycurl
-
 if sys.version_info < (2,6,):
   import simplejson as json
 else:
@@ -60,18 +58,6 @@ def fetch_recent_files():
   items = json.loads(r.read())['items']
   return list(FolderItem(i) for i in items)
 
-def new_file(username, passwd, destpath, targetpath):
-  curl = pycurl.Curl()
-  curl.setopt(pycurl.USERPWD, '%s:%s' % (username, passwd))
-  curl.setopt(pycurl.POST, 1)
-  curl.setopt(pycurl.URL, _build_url(username, destpath))
-
-  curl.setopt(curl.HTTPPOST, [
-    ("file", (curl.FORM_FILE, targetpath))
-  ])
-  curl.perform()
-  curl.close()
-
 if __name__ == '__main__':
   '''Running in standalone'''
   if len(sys.argv) < 2:
@@ -92,13 +78,15 @@ if __name__ == '__main__':
       print 'example: baconfile fetch someuser stuff/file.txt'
       print ''
       exit(1)
-    if len(sys.argv) == 5:
+    elif len(sys.argv) == 5:
       dest = sys.argv[4]
-    else: dest = sys.argv[3].rsplit('/',1)[-1]
+    else: 
+      dest = sys.argv[3].rsplit('/',1)[-1]
 
     try:
       f = fetch_file(sys.argv[2], sys.argv[3])
       f.save_file(dest)
+      exit()
     except urllib2.HTTPError, e:
       print 'Unable to fetch file: %s' % e
       exit(1)
@@ -111,7 +99,7 @@ if __name__ == '__main__':
         print '   folder  -  folder to list (if not provided, lists root)'
         print ''
         exit(1)
-      if len(sys.argv) == 4:
+      elif len(sys.argv) == 4:
         folder = sys.argv[3]
       else: folder = ''
       items = fetch_folder(sys.argv[2], folder)
@@ -126,6 +114,7 @@ if __name__ == '__main__':
          (time, i.type.rjust(6), size.rjust(8), i.name)
 
     print '  %i items' % len(items)
+    exit()
 
   else:
     print 'Invalid command. Type "baconfile" for help.'
