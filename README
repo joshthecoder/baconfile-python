@@ -32,6 +32,10 @@ Available commands:
   ls     - list files within a folder
   recent - list recently uploaded files
 
+Issues
+------
+Please report any issues to <http://github.com/joshthecoder/baconfile-python/issues>.
+
 License: MIT 
 Author: Joshua Roesslein
 Repository: http://github.com/joshthecoder/baconfile-python
