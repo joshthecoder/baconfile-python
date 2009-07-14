@@ -24,7 +24,6 @@ class FolderItem(object):
     self.url = data['url']
     self.file_url = data['file_url']
     self.time_modified = data['time_modified']
-    self.twitter_url = data['twitter_url']
     self.tiny_url = data['tiny_url']
     self.user = data['user']
     self.is_folder = data['is_folder']
