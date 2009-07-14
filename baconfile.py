@@ -18,20 +18,20 @@ baconfile_url = 'http://baconfile.com/'
 
 class FolderItem(object):
   def __init__(self, data):
-    self.id = data['id']
-    self.size = data['size']
-    self.permalink = data['permalink']
-    self.name = data['name']
-    self.url = data['url']
-    self.file_url = data['file_url']
-    self.time_modified = data['time_modified']
-    self.tiny_url = data['tiny_url']
-    self.user = data['user']
-    self.is_folder = data['is_folder']
-    self.path = data['path']
-    self.content_type = data['content_type']
-    self.type = data['type']
-    self.description = data['description']
+    self.id = data.get('id')
+    self.size = data.get('size', 0)
+    self.permalink = data.get('permalink')
+    self.name = data.get('name')
+    self.url = data.get('url')
+    self.file_url = data.get('file_url')
+    self.time_modified = data.get('time_modified')
+    self.tiny_url = data.get('tiny_url')
+    self.user = data.get('user')
+    self.is_folder = data.get('is_folder')
+    self.path = data.get('path')
+    self.content_type = data.get('content_type')
+    self.type = data.get('type')
+    self.description = data.get('description')
 
   def read_file(self, amt=None):
     r = urllib2.urlopen(self.file_url)
