@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # Copyright 2009 Joshua Roesslein <jroesslein at gmail.com>
 # Licensed under the MIT License
 # http://github.com/joshthecoder/baconfile-python
