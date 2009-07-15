@@ -16,6 +16,8 @@ else:
 
 baconfile_url = 'http://baconfile.com/'
 
+"""Baconfile library"""
+
 class FolderItem(object):
   def __init__(self, data):
     self.id = data.get('id')
@@ -74,64 +76,92 @@ def new_folder(credentials, folder_name):
   item = json.loads(r.read())
   return FolderItem(item)
 
-if __name__ == '__main__':
-  '''Running in standalone'''
-  if len(sys.argv) < 2:
-    print 'Usage: baconfile <command>'
-    print 'Commands:'
-    print '    fetch  -  fetch file from baconfile.com'
-    print '    ls     -  list folder contents'
-    print '    recent -  list recently uploaded files'
+"""Baconfile commandline"""
+
+def show_help(page=''):
+  if page == 'fetch':
+    print 'Download a file from baconfile.com'
+    print 'Usage: fetch <user> <path> [dest]'
+    print '    user   -  owner of file being fetched'
+    print '    path   -  path to file'
+    print '    dest   -  where to save file [optional]'
     print ''
-    exit(1)
-
-  '''Fetch command'''
-  if sys.argv[1] == 'fetch':
-    if len(sys.argv) < 4:
-      print 'Usage: baconfile fetch <username> <remotefile> [dest]'
-      print '   remotefile  -  path on baconfile.com where file is stored'
-      print '   dest        -  local path to save file (optional)'
-      print 'example: baconfile fetch someuser stuff/file.txt'
-      print ''
-      exit(1)
-    elif len(sys.argv) == 5:
-      dest = sys.argv[4]
-    else: 
-      dest = sys.argv[3].rsplit('/',1)[-1]
-
-    try:
-      f = fetch_file(sys.argv[2], sys.argv[3])
-      f.save_file(dest)
-      exit()
-    except urllib2.HTTPError, e:
-      print 'Unable to fetch file: %s' % e
-      exit(1)
-
-  '''ls command'''
-  if sys.argv[1] == 'ls' or sys.argv[1] == 'recent':
-    if sys.argv[1] == 'ls':
-      if len(sys.argv) < 3:
-        print 'Usage: baconfile ls <username> [folder]'
-        print '   folder  -  folder to list (if not provided, lists root)'
-        print ''
-        exit(1)
-      elif len(sys.argv) == 4:
-        folder = sys.argv[3]
-      else: folder = ''
-      items = fetch_folder(sys.argv[2], folder)
-    else:
-      items = fetch_recent_files()
-
-    for i in items:
-      if i.size is None: size = 'D'
-      else: size = str(i.size)
-      time = str(datetime.fromtimestamp(i.time_modified))
-      print '%s  %s  %s  %s' % \
-         (time, i.type.rjust(6), size.rjust(8), i.name)
-
-    print '  %i items' % len(items)
-    exit()
-
+  elif page == 'ls':
+    print 'List infomation about files/folders'
+    print 'Usage: ls <user> [folder]'
+    print '    user   -  owner of files/folders to list'
+    print '    folder -  folder to list [default: user\'s root folder]'
+    print ''
+  elif page == 'recent':
+    print 'Get listing of most recently added files'
+    print 'Usage: recent'
+    print ''
   else:
-    print 'Invalid command. Type "baconfile" for help.'
+    print 'Baconfile commandline tool'
+    print 'Usage: <command> [options]...'
+    print 'Commands:'
+    print '    fetch  -  download a file from baconfile.com'
+    print '    ls     -  list infomation about files/folders'
+    print '    recent -  list most recently added files'
+    print 'Type just the command name to get more infomation.'
+
+def print_items(items):
+  for i in items:
+    if i.size is None:
+      size = 'D'
+    else:
+      size = str(i.size)
+    time = str(datetime.fromtimestamp(i.time_modified))
+    print '%s  %s  %s  %s' % (time, i.type.rjust(6), size.rjust(8), i.name)
+
+  print '  %i items' % len(items)
+
+def cmd_fetch(user, path, dest=''):
+  try:
+    f = fetch_file(user, path)
+    f.save_file(os.path.join(dest, f.name))
+  except urllib2.HTTPError, e:
+    print 'Failed to fetch file: %s' % e
     exit(1)
+
+def cmd_ls(user, folder=''):
+  try:
+    items = fetch_folder(user, folder)
+    print_items(items)
+  except urllib2.HTTPError, e:
+    print 'Failed to list folder: %s' % e
+    exit(1)
+
+def cmd_recent():
+  try:
+    items = fetch_recent_files()
+    print_items(items)
+  except urllib2.HTTPError, e:
+    print 'Failed to fetch recent files: %s' % e
+    exit(1)
+
+if __name__ == '__main__':
+  # Get command and args
+  if len(sys.argv) < 2:
+    show_help()
+    exit(1)
+  command = sys.argv[1]
+  args = sys.argv[2:]
+
+  # Call command
+  try:
+    if command == 'fetch':
+      cmd_fetch(*args)
+    elif command == 'ls':
+      cmd_ls(*args)
+    elif command == 'recent':
+      cmd_recent()
+    else:
+      print '%s invalid command!' % command
+      show_help()
+  except TypeError:
+    # missing required arguments
+    if len(args) > 0:
+      print 'Missing required parameters!'
+    show_help(command)
+
