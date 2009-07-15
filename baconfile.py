@@ -3,7 +3,9 @@
 # Licensed under the MIT License
 # http://github.com/joshthecoder/baconfile-python
 
+import urllib
 import urllib2
+import base64
 import os, sys
 from datetime import datetime
 
@@ -57,6 +59,20 @@ def fetch_recent_files():
   r = urllib2.urlopen(baconfile_url + 'public.json')
   items = json.loads(r.read())['items']
   return list(FolderItem(i) for i in items)
+
+def _build_headers(credentials):
+  return {
+    'Authorization':
+      'Basic %s' % base64.b64encode('%s:%s' % (credentials[0], credentials[1]))
+  }
+
+def new_folder(credentials, folder_name):
+  headers = _build_headers(credentials)
+  data = urllib.urlencode({'name': folder_name})
+  req = urllib2.Request(baconfile_url + credentials[0] + '.json', data, headers)
+  r = urllib2.urlopen(req)
+  item = json.loads(r.read())
+  return FolderItem(item)
 
 if __name__ == '__main__':
   '''Running in standalone'''
