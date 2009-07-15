@@ -45,21 +45,39 @@ class FolderItem(object):
     f.write(self.read_file())
     f.close()
 
+class BaconfileError(Exception):
+  def __init__(self, reason='Baconfile error occured.'):
+    self.reason = reason
+  def __str__(self):
+    return self.reason
+
 def _build_url(username, path):
   return baconfile_url + os.path.join(username, path) + '.json'
 
+def _make_request(url, data=None, headers={}):
+  try:
+    headers['User-Agent'] = 'baconfilepy/1.0'
+    req = urllib2.Request(url, data, headers)
+    return urllib2.urlopen(req)
+  except urllib2.HTTPError, e:
+    try:
+      reason = str(json.loads(e.read())['error']['message'])
+    except Exception:
+      reason = 'unkown'
+    raise BaconfileError(reason)
+
 def fetch_folder(username, folder):
-  r = urllib2.urlopen(_build_url(username, folder))
+  r = _make_request(_build_url(username, folder))
   items = json.loads(r.read())['items']
   return list(FolderItem(i) for i in items) 
 
 def fetch_file(username, filepath):
-  r = urllib2.urlopen(_build_url(username, filepath))
+  r = _make_request(_build_url(username, filepath))
   item = json.loads(r.read())
   return FolderItem(item)
 
 def fetch_recent_files():
-  r = urllib2.urlopen(baconfile_url + 'public.json')
+  r = _make_request(baconfile_url + 'public.json')
   items = json.loads(r.read())['items']
   return list(FolderItem(i) for i in items)
 
@@ -72,8 +90,7 @@ def _build_headers(credentials):
 def new_folder(credentials, folder_name):
   headers = _build_headers(credentials)
   data = urllib.urlencode({'name': folder_name})
-  req = urllib2.Request(baconfile_url + credentials[0] + '.json', data, headers)
-  r = urllib2.urlopen(req)
+  r = _make_request(baconfile_url + credentials[0] + '.json', data, headers)
   item = json.loads(r.read())
   return FolderItem(item)
 
@@ -137,31 +154,31 @@ def cmd_fetch(user, path, dest=''):
   try:
     f = fetch_file(user, path)
     f.save_file(os.path.join(dest, f.name))
-  except urllib2.HTTPError, e:
-    print 'Failed to fetch file: %s' % e
+  except BaconfileError, e:
+    print e
     exit(1)
 
 def cmd_ls(user, folder=''):
   try:
     items = fetch_folder(user, folder)
     print_items(items)
-  except urllib2.HTTPError, e:
-    print 'Failed to list folder: %s' % e
+  except BaconfileError, e:
+    print e
     exit(1)
 
 def cmd_recent():
   try:
     items = fetch_recent_files()
     print_items(items)
-  except urllib2.HTTPError, e:
-    print 'Failed to fetch recent files: %s' % e
+  except BaconfileError, e:
+    print e
     exit(1)
 
 def cmd_mkdir(folder_name):
   try:
     new_folder(get_credentials(), folder_name)
-  except urllib2.HTTPError, e:
-    print 'Failed to create new folder: %s' % e
+  except BaconfileError, e:
+    print e
     exit(1)
 
 if __name__ == '__main__':
