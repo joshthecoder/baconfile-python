@@ -1,6 +1,6 @@
 Baconfile Python Library/Tool
 =============================
-A library and tool for baconfile.com for python!
+A python library and tool for access the baconfile.com API
 
 Library
 -------
@@ -11,26 +11,20 @@ To install just be sure to put the module into your python path
 or simply include the module within your project's source.
 
 For more infomation check out the hello.py example.
-Also read through the baconfile.py module, its not that big. 
+Also read through the baconfile.py module.
 
-Tool
-----
+Commandline tool
+----------------
 You may also use the baconfile module as a standalone tool
 from the commandline.
 
-To install:
+To install for Linux:
   1. Copy baconfile.py into a folder that is in your PATH.
-     Example: cp baconfile.py /usr/bin/baconfile
+        *cp baconfile.py /usr/bin/baconfile*
   2. Give the baconfile executable permission.
-     Example: chmod +x /usr/bin/baconfile
+        *chmod +x /usr/bin/baconfile*
   3. Enjoy by typing baconfile into the commandline.
-
-Usuage: baconfile <command>
-
-Available commands:
-  fetch  - fetch a file from baconfile.com
-  ls     - list files within a folder
-  recent - list recently uploaded files
+        *baconfile*        
 
 Issues
 ------
