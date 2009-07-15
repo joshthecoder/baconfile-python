@@ -8,6 +8,7 @@ import urllib2
 import base64
 import os, sys
 from datetime import datetime
+from getpass import getpass
 
 if sys.version_info < (2,6,):
   import simplejson as json
@@ -85,16 +86,24 @@ def show_help(page=''):
     print '    user   -  owner of file being fetched'
     print '    path   -  path to file'
     print '    dest   -  where to save file [optional]'
+    print 'Example: baconfile fetch john pictures/tree.jpg /home/me/pictures'
     print ''
   elif page == 'ls':
     print 'List infomation about files/folders'
     print 'Usage: ls <user> [folder]'
     print '    user   -  owner of files/folders to list'
     print '    folder -  folder to list [default: user\'s root folder]'
+    print 'Example: baconfile ls john music'
     print ''
   elif page == 'recent':
     print 'Get listing of most recently added files'
     print 'Usage: recent'
+    print ''
+  elif page == 'mkdir':
+    print 'Create a new folder on baconfile.com'
+    print 'Usage: mkdir <folder>'
+    print '    folder -  path + folder name'
+    print 'Example: baconfile mkdir docs/papers'
     print ''
   else:
     print 'Baconfile commandline tool'
@@ -104,6 +113,14 @@ def show_help(page=''):
     print '    ls     -  list infomation about files/folders'
     print '    recent -  list most recently added files'
     print 'Type just the command name to get more infomation.'
+
+# query user for username and password
+def get_credentials():
+  print 'Baconfile.com login credentials required.:'
+  print 'Username: ',
+  username = raw_input()
+  password = getpass()
+  return username, password
 
 def print_items(items):
   for i in items:
@@ -140,6 +157,13 @@ def cmd_recent():
     print 'Failed to fetch recent files: %s' % e
     exit(1)
 
+def cmd_mkdir(folder_name):
+  try:
+    new_folder(get_credentials(), folder_name)
+  except urllib2.HTTPError, e:
+    print 'Failed to create new folder: %s' % e
+    exit(1)
+
 if __name__ == '__main__':
   # Get command and args
   if len(sys.argv) < 2:
@@ -156,6 +180,8 @@ if __name__ == '__main__':
       cmd_ls(*args)
     elif command == 'recent':
       cmd_recent()
+    elif command == 'mkdir':
+      cmd_mkdir(*args)
     else:
       print '%s invalid command!' % command
       show_help()
@@ -164,4 +190,6 @@ if __name__ == '__main__':
     if len(args) > 0:
       print 'Missing required parameters!'
     show_help(command)
+  except KeyboardInterrupt:
+    print ''
 
