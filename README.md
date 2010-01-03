@@ -17,7 +17,7 @@ Also read through the baconfile.py module.
 
 baconfile-python requires the following libraries:
  
- * JSON (found at [python.org](http://pypi.python.org/pypi/python-json/3.4) or the python-json package on debian.)
+ * JSON (found at [python.org](http://pypi.python.org/pypi/simplejson/2.0.9) or the python-simplejson package on debian.)
 
 ## Commandline tool
 
